@@ -18,6 +18,8 @@ interface IRender : GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvailableListe
 
     fun setScaleType(scaleType: ScaleType)
 
+    fun measureInternal(width: Float, height: Float, videoWidth: Float, videoHeight: Float)
+
     interface SurfaceListener {
         fun onSurfacePrepared(surface: Surface)
 
