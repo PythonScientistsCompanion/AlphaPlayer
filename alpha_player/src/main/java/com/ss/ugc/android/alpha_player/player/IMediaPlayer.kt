@@ -1,6 +1,9 @@
 package com.ss.ugc.android.alpha_player.player
 
 import android.view.Surface
+import com.ss.ugc.android.alpha_player.model.VideoInfo
+import java.io.IOException
+import java.lang.Exception
 
 interface IMediaPlayer<T : IMediaPlayer<T>> {
 
@@ -14,7 +17,10 @@ interface IMediaPlayer<T : IMediaPlayer<T>> {
 
     fun setSurface(surface: Surface)
 
+    @Throws(IOException::class)
     fun setDataSource(dataPath: String)
+
+    fun prepareAsync()
 
     fun start()
 
@@ -29,6 +35,9 @@ interface IMediaPlayer<T : IMediaPlayer<T>> {
     fun setLooping(looping: Boolean)
 
     fun setScreenOnWhilePlaying(onWhilePlaying: Boolean)
+
+    @Throws(Exception::class)
+    fun getVideoInfo(): VideoInfo
 
 
     interface OnCompletionListener<T> {
