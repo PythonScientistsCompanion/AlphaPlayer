@@ -5,6 +5,9 @@ import com.ss.ugc.android.alpha_player.model.VideoInfo
 import java.io.IOException
 import java.lang.Exception
 
+/**
+ * created by dengzhuoyao on 2020/07/07
+ */
 interface IMediaPlayer<T : IMediaPlayer<T>> {
 
     fun setOnCompletionListener(completionListener: OnCompletionListener<T>)

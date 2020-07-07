@@ -2,6 +2,9 @@ package com.ss.ugc.android.alpha_player.player
 
 import android.content.Context
 
+/**
+ * created by dengzhuoyao on 2020/07/07
+ */
 abstract class AbsPlayer<T : AbsPlayer<T>>(context: Context) : IMediaPlayer<AbsPlayer<T>>{
 
     lateinit var completionListener: IMediaPlayer.OnCompletionListener<AbsPlayer<T>>

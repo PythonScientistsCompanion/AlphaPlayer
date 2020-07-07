@@ -8,6 +8,9 @@ import android.view.Surface
 import com.ss.ugc.android.alpha_player.model.VideoInfo
 import java.lang.Exception
 
+/**
+ * created by dengzhuoyao on 2020/07/07
+ */
 class DefaultSystemPlayer(context: Context) : AbsPlayer<DefaultSystemPlayer>(context) {
 
     val mediaPlayer : MediaPlayer = MediaPlayer()

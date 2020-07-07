@@ -3,8 +3,11 @@ package com.ss.ugc.android.alpha_player.render
 import android.graphics.SurfaceTexture
 import android.opengl.GLSurfaceView
 import android.view.Surface
-import javax.sql.DataSource
+import com.ss.ugc.android.alpha_player.model.ScaleType
 
+/**
+ * created by dengzhuoyao on 2020/07/07
+ */
 interface IRender : GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvailableListener {
 
     fun setSurfaceListener(surfaceListener: SurfaceListener)
@@ -13,7 +16,7 @@ interface IRender : GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvailableListe
 
     fun onCompletion()
 
-//    fun setScaleType(scaleType: DataSource.ScaleType)
+    fun setScaleType(scaleType: ScaleType)
 
     interface SurfaceListener {
         fun onSurfacePrepared(surface: Surface)
