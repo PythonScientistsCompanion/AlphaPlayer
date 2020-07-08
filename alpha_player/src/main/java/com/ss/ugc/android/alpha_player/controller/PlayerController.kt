@@ -133,8 +133,9 @@ class PlayerController(context: Context, owner: LifecycleOwner, mediaPlayer: IMe
 
     override fun attachAlphaView(parentView: ViewGroup) {
         if (parentView.indexOfChild(alphaVideoView) == -1) {
-            val viewParent = alphaVideoView!!.parent as ViewGroup
-            viewParent.removeView(alphaVideoView)
+            alphaVideoView!!.parent?.let {
+                (it as ViewGroup).removeView(alphaVideoView)
+            }
             parentView.addView(alphaVideoView)
         }
     }
@@ -333,6 +334,7 @@ class PlayerController(context: Context, owner: LifecycleOwner, mediaPlayer: IMe
                 RESUME -> {
                     if (isPlaying) {
                         startPlay()
+                    } else {
                     }
                 }
                 STOP -> {
@@ -368,6 +370,7 @@ class PlayerController(context: Context, owner: LifecycleOwner, mediaPlayer: IMe
                     playerState = PlayerState.NOT_PREPARED
                     isPlaying = false
                 }
+                else -> {}
             }
         }
         return true

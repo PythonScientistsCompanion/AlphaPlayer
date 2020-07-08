@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity() {
     private fun getResourcePath(): String {
         val dirPath = basePath + File.separator + "videoGift" + File.separator
         val dirFile = File(dirPath)
-        if (dirFile.exists() && dirFile.listFiles().size > 0) {
+        if (dirFile.exists() && dirFile.listFiles() != null && dirFile.listFiles().isNotEmpty()) {
             return dirFile.listFiles()[0].absolutePath
         }
         return ""
