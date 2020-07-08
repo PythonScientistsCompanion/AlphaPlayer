@@ -1,10 +1,10 @@
 package com.ss.ugc.android.alpha_player
 
-import android.widget.ImageView
+import com.ss.ugc.android.alpha_player.model.ScaleType
 
 interface IPlayerAction {
 
-    fun onVideoSizeChanged(videoWidth: Int, videoHeight: Int, scaleType: ImageView.ScaleType)
+    fun onVideoSizeChanged(videoWidth: Int, videoHeight: Int, scaleType: ScaleType)
 
     fun startAction()
 

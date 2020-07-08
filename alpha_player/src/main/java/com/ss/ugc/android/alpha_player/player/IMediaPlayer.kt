@@ -8,15 +8,15 @@ import java.lang.Exception
 /**
  * created by dengzhuoyao on 2020/07/07
  */
-interface IMediaPlayer<T : IMediaPlayer<T>> {
+interface IMediaPlayer {
 
-    fun setOnCompletionListener(completionListener: OnCompletionListener<T>)
+    fun setOnCompletionListener(completionListener: OnCompletionListener)
 
-    fun setOnPreparedListener(preparedListener: OnPreparedListener<T>)
+    fun setOnPreparedListener(preparedListener: OnPreparedListener)
 
-    fun setOnErrorListener(errorListener: OnErrorListener<T>)
+    fun setOnErrorListener(errorListener: OnErrorListener)
 
-    fun setOnFirstFrameListener(firstFrameListener: OnFirstFrameListener<T>)
+    fun setOnFirstFrameListener(firstFrameListener: OnFirstFrameListener)
 
     fun setSurface(surface: Surface)
 
@@ -43,19 +43,19 @@ interface IMediaPlayer<T : IMediaPlayer<T>> {
     fun getVideoInfo(): VideoInfo
 
 
-    interface OnCompletionListener<T> {
-        fun onCompletion(t: T)
+    interface OnCompletionListener {
+        fun onCompletion()
     }
 
-    interface OnPreparedListener<T> {
-        fun onPrepared(t: T)
+    interface OnPreparedListener {
+        fun onPrepared()
     }
 
-    interface OnErrorListener<T> {
-        fun onError(t: T, what: Int, extra: Int, desc: String)
+    interface OnErrorListener {
+        fun onError(what: Int, extra: Int, desc: String)
     }
 
-    interface OnFirstFrameListener<T> {
-        fun onFirstFrame(t: T)
+    interface OnFirstFrameListener {
+        fun onFirstFrame()
     }
 }

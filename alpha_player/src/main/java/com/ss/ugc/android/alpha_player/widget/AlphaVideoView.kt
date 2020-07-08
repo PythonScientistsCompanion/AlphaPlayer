@@ -9,6 +9,7 @@ import com.ss.ugc.android.alpha_player.controller.IPlayerController
 import com.ss.ugc.android.alpha_player.controller.IPlayerControllerExt
 import com.ss.ugc.android.alpha_player.model.ScaleType
 import com.ss.ugc.android.alpha_player.render.IRender
+import com.ss.ugc.android.alpha_player.render.VideoRenderer
 
 class AlphaVideoView @JvmOverloads constructor(context: Context, attr: AttributeSet? = null)
     : GLSurfaceView(context, attr) {
@@ -52,17 +53,18 @@ class AlphaVideoView @JvmOverloads constructor(context: Context, attr: Attribute
     }
 
     fun addOnSurfacePreparedListener() {
-        mRenderer?.let {
-            it.setSurfaceListener(mSurfaceListener)
-        }
+        mRenderer?.setSurfaceListener(mSurfaceListener)
     }
 
     fun setPlayerController(playerController: IPlayerControllerExt) {
         this.mPlayerController = playerController
     }
 
-    fun setVideoRenderer() {
-        // TODO: dengzhuoyao
+    fun setVideoRenderer(renderer: VideoRenderer) {
+        this.mRenderer = renderer
+        setRenderer(renderer)
+        addOnSurfacePreparedListener()
+        renderMode = RENDERMODE_WHEN_DIRTY
     }
 
     fun setScaleType(scaleType: ScaleType) {

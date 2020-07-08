@@ -5,26 +5,26 @@ import android.content.Context
 /**
  * created by dengzhuoyao on 2020/07/07
  */
-abstract class AbsPlayer<T : AbsPlayer<T>>(context: Context) : IMediaPlayer<AbsPlayer<T>>{
+abstract class AbsPlayer(context: Context? = null) : IMediaPlayer {
 
-    lateinit var completionListener: IMediaPlayer.OnCompletionListener<AbsPlayer<T>>
-    lateinit var preparedListener: IMediaPlayer.OnPreparedListener<AbsPlayer<T>>
-    lateinit var errorListener: IMediaPlayer.OnErrorListener<AbsPlayer<T>>
-    lateinit var firstFrameListener: IMediaPlayer.OnFirstFrameListener<AbsPlayer<T>>
+    lateinit var completionListener: IMediaPlayer.OnCompletionListener
+    lateinit var preparedListener: IMediaPlayer.OnPreparedListener
+    lateinit var errorListener: IMediaPlayer.OnErrorListener
+    lateinit var firstFrameListener: IMediaPlayer.OnFirstFrameListener
 
-    override fun setOnCompletionListener(completionListener: IMediaPlayer.OnCompletionListener<AbsPlayer<T>>) {
+    override fun setOnCompletionListener(completionListener: IMediaPlayer.OnCompletionListener) {
         this.completionListener = completionListener
     }
 
-    override fun setOnPreparedListener(preparedListener: IMediaPlayer.OnPreparedListener<AbsPlayer<T>>) {
+    override fun setOnPreparedListener(preparedListener: IMediaPlayer.OnPreparedListener) {
         this.preparedListener = preparedListener
     }
 
-    override fun setOnErrorListener(errorListener: IMediaPlayer.OnErrorListener<AbsPlayer<T>>) {
+    override fun setOnErrorListener(errorListener: IMediaPlayer.OnErrorListener) {
         this.errorListener = errorListener
     }
 
-    override fun setOnFirstFrameListener(firstFrameListener: IMediaPlayer.OnFirstFrameListener<AbsPlayer<T>>) {
+    override fun setOnFirstFrameListener(firstFrameListener: IMediaPlayer.OnFirstFrameListener) {
         this.firstFrameListener = firstFrameListener
     }
 }

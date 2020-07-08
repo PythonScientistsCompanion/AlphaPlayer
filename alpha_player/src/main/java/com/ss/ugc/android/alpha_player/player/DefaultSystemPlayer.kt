@@ -11,7 +11,7 @@ import java.lang.Exception
 /**
  * created by dengzhuoyao on 2020/07/07
  */
-class DefaultSystemPlayer(context: Context) : AbsPlayer<DefaultSystemPlayer>(context) {
+class DefaultSystemPlayer : AbsPlayer() {
 
     val mediaPlayer : MediaPlayer = MediaPlayer()
     val retriever: MediaMetadataRetriever = MediaMetadataRetriever()
@@ -20,19 +20,19 @@ class DefaultSystemPlayer(context: Context) : AbsPlayer<DefaultSystemPlayer>(con
     init {
         mediaPlayer.setOnCompletionListener(MediaPlayer.OnCompletionListener { mediaPlayer ->
             if (completionListener != null) {
-                completionListener.onCompletion(this)
+                completionListener.onCompletion()
             }
         })
 
         mediaPlayer.setOnPreparedListener(MediaPlayer.OnPreparedListener { mediaPlayer ->
             if (preparedListener != null) {
-                preparedListener.onPrepared(this)
+                preparedListener.onPrepared()
             }
         })
 
         mediaPlayer.setOnErrorListener(MediaPlayer.OnErrorListener { mp, what, extra ->
             if (errorListener != null) {
-                errorListener.onError(this, what, extra, "")
+                errorListener.onError(what, extra, "")
             }
             false
         })
@@ -40,7 +40,7 @@ class DefaultSystemPlayer(context: Context) : AbsPlayer<DefaultSystemPlayer>(con
         mediaPlayer.setOnInfoListener { mp, what, extra ->
             if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
                 if (firstFrameListener != null) {
-                    firstFrameListener.onFirstFrame(this)
+                    firstFrameListener.onFirstFrame()
                 }
             }
             false
