@@ -18,6 +18,9 @@ import java.util.concurrent.atomic.AtomicBoolean
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
+/**
+ * created by dengzhuoyao on 2020/07/07
+ */
 class VideoRenderer(glSurfaceView: GLSurfaceView) : IRender {
 
     private val TAG = "VideoRender"

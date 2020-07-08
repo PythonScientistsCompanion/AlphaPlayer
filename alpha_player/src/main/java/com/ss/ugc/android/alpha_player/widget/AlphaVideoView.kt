@@ -9,6 +9,9 @@ import com.ss.ugc.android.alpha_player.controller.IPlayerControllerExt
 import com.ss.ugc.android.alpha_player.model.ScaleType
 import com.ss.ugc.android.alpha_player.render.IRender
 
+/**
+ * created by dengzhuoyao on 2020/07/07
+ */
 class AlphaVideoView @JvmOverloads constructor(context: Context, attr: AttributeSet? = null)
     : GLSurfaceView(context, attr) {
 

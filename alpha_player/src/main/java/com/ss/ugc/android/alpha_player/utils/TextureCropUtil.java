@@ -3,6 +3,9 @@ package com.ss.ugc.android.alpha_player.utils;
 
 import com.ss.ugc.android.alpha_player.model.ScaleType;
 
+/**
+ * created by dengzhuoyao on 2020/07/07
+ */
 public class TextureCropUtil {
 
     public static float[] calculateHalfRightVerticeData(ScaleType scaleType,

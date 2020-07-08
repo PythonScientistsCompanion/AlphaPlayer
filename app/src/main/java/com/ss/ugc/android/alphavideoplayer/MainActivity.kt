@@ -13,8 +13,12 @@ import com.ss.ugc.android.alphavideoplayer.utils.PermissionUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 
+/**
+ * created by dengzhuoyao on 2020/07/08
+ */
 class MainActivity : AppCompatActivity() {
 
+    private val TAG = "MainActivity"
     val basePath = Environment.getExternalStorageDirectory().absolutePath
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,23 +29,31 @@ class MainActivity : AppCompatActivity() {
         initVideoGiftView()
     }
 
-    fun initVideoGiftView() {
+    private fun initVideoGiftView() {
         video_gift_view.initPlayerController(this, this, playerAction, monitor)
     }
 
-    val playerAction = object : IPlayerAction {
+    private val playerAction = object : IPlayerAction {
         override fun onVideoSizeChanged(videoWidth: Int, videoHeight: Int, scaleType: ScaleType) {
+            Log.i(TAG,
+                "call onVideoSizeChanged(), videoWidth = $videoWidth, videoHeight = $videoHeight, scaleType = $scaleType"
+            )
         }
 
         override fun startAction() {
+            Log.i(TAG, "call startAction()")
         }
 
         override fun endAction() {
+            Log.i(TAG, "call endAction")
         }
     }
 
-    val monitor = object : IMonitor {
+    private val monitor = object : IMonitor {
         override fun monitor(state: Boolean, playType: String, what: Int, extra: Int, errorInfo: String) {
+            Log.i(TAG,
+                "call monitor(), state: $state, playType = $playType, what = $what, extra = $extra, errorInfo = $errorInfo"
+            )
         }
     }
 
@@ -57,14 +69,14 @@ class MainActivity : AppCompatActivity() {
         val testPath = getResourcePath()
         Log.i("dzy", "play gift file path : $testPath")
         if ("".equals(testPath)) {
-            Toast.makeText(this, "请先运行 gift_install.sh gift/hotsoonNew 导入视频礼物", Toast.LENGTH_SHORT)
+            Toast.makeText(this, "please run 'gift_install.sh gift/demoRes' for load alphaVideo resource.", Toast.LENGTH_SHORT)
                 .show()
         }
         video_gift_view.startVideoGift(testPath)
     }
 
     private fun getResourcePath(): String {
-        val dirPath = basePath + File.separator + "videoGift" + File.separator
+        val dirPath = basePath + File.separator + "alphaVideoGift" + File.separator
         val dirFile = File(dirPath)
         if (dirFile.exists() && dirFile.listFiles() != null && dirFile.listFiles().isNotEmpty()) {
             return dirFile.listFiles()[0].absolutePath

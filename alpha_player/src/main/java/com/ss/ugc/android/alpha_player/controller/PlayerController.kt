@@ -27,6 +27,9 @@ import com.ss.ugc.android.alpha_player.widget.AlphaVideoView
 import java.io.File
 import java.lang.Exception
 
+/**
+ * created by dengzhuoyao on 2020/07/08
+ */
 class PlayerController(context: Context, owner: LifecycleOwner, mediaPlayer: IMediaPlayer): IPlayerControllerExt, LifecycleObserver, Handler.Callback {
 
     companion object {

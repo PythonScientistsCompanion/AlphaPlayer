@@ -17,6 +17,9 @@ import com.ss.ugc.android.alpha_player.model.DataSource
 import com.ss.ugc.android.alpha_player.player.DefaultSystemPlayer
 import com.ss.ugc.android.alphavideoplayer.utils.JsonUtil
 
+/**
+ * created by dengzhuoyao on 2020/07/08
+ */
 class VideoGiftView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
@@ -56,7 +59,7 @@ class VideoGiftView @JvmOverloads constructor(
         startDataSource(dataSource)
     }
 
-    fun startDataSource(dataSource: DataSource) {
+    private fun startDataSource(dataSource: DataSource) {
         if (!dataSource.isValid()) {
             Log.e(TAG, "startDataSource: dataSource is invalid.")
         }
