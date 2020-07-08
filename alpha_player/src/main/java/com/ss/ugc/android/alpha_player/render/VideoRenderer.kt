@@ -18,68 +18,53 @@ import java.util.concurrent.atomic.AtomicBoolean
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class VideoRenderer: IRender {
+class VideoRenderer(glSurfaceView: GLSurfaceView) : IRender {
 
-    companion object {
-        val TAG = "VideoRenderer"
-        val FLOAT_SIZE_BYTES = 4
-        val TRIANGLE_VERTICES_DATA_STRIDE_BYTES = 5 * FLOAT_SIZE_BYTES
-        val TRIANGLE_VERTICES_DATA_POS_OFFSET = 0
-        val TRIANGLE_VERTICES_DATA_UV_OFFSET = 3
+    private val TAG = "VideoRender"
 
-        val GL_TEXTURE_EXTERNAL_OES: Int = 0x8D65;
-    }
+    private val FLOAT_SIZE_BYTES = 4
+    private val TRIANGLE_VERTICES_DATA_STRIDE_BYTES = 5 * FLOAT_SIZE_BYTES
+    private val TRIANGLE_VERTICES_DATA_POS_OFFSET = 0
+    private val TRIANGLE_VERTICES_DATA_UV_OFFSET = 3
+    private val GL_TEXTURE_EXTERNAL_OES = 0x8D65
 
-    var halfRightVerticeData = floatArrayOf(
+    private var halfRightVerticeData = floatArrayOf(
         // X, Y, Z, U, V
         -1.0f, -1.0f, 0f, 0.5f, 0f,
         1.0f, -1.0f, 0f, 1f, 0f,
         -1.0f, 1.0f, 0f, 0.5f, 1f,
         1.0f, 1.0f, 0f, 1f, 1f
     )
-    var triangleVertices: FloatBuffer? = null
-    var mVPMatrix: FloatArray = FloatArray(16, {0f})
-    var sTMatrix: FloatArray = FloatArray(16, {0f})
 
-    var programId: Int = 0
-    var textureId: Int = 0
-    var uMVPMatrixHandle: Int = 0
-    var uSTMatrixHandle: Int = 0
-    var aPositionHandle: Int = 0
-    var aTextureHandle: Int = 0
+    private var triangleVertices: FloatBuffer? = null
 
-    var surfaceTexture: SurfaceTexture? = null
-    var updateSurface: AtomicBoolean = AtomicBoolean(false)
-    var canDraw: AtomicBoolean = AtomicBoolean(false)
+    private val mVPMatrix = FloatArray(16)
+    private val sTMatrix = FloatArray(16)
 
-    var glSurfaceView: GLSurfaceView? = null
-    var mSurfaceListener: IRender.SurfaceListener? = null
-    var mScaleType = ScaleType.ScaleAspectFill
+    private var programID: Int = 0
+    private var textureID: Int = 0
+    private var uMVPMatrixHandle: Int = 0
+    private var uSTMatrixHandle: Int = 0
+    private var aPositionHandle: Int = 0
+    private var aTextureHandle: Int = 0
 
-    constructor(glSurfaceView: GLSurfaceView) {
-        this.glSurfaceView = glSurfaceView
+    private var surfaceTexture: SurfaceTexture? = null
+    private val updateSurface = AtomicBoolean(false)
+    private val canDraw = AtomicBoolean(false)
+
+    private var surfaceListener: IRender.SurfaceListener? = null
+    private var glSurfaceView: GLSurfaceView? = glSurfaceView
+    private var scaleType = ScaleType.ScaleAspectFill
+
+    init {
         triangleVertices = ByteBuffer.allocateDirect(halfRightVerticeData.size * FLOAT_SIZE_BYTES)
             .order(ByteOrder.nativeOrder()).asFloatBuffer()
-        triangleVertices?.put(halfRightVerticeData)?.position(0)
+        triangleVertices!!.put(halfRightVerticeData).position(0)
         Matrix.setIdentityM(sTMatrix, 0)
     }
 
-    override fun setSurfaceListener(surfaceListener: IRender.SurfaceListener) {
-        this.mSurfaceListener = surfaceListener
-    }
-
-    override fun onFirstFrame() {
-        canDraw.compareAndSet(false, true)
-        glSurfaceView!!.requestRender()
-    }
-
-    override fun onCompletion() {
-        canDraw.compareAndSet(true, false)
-        glSurfaceView!!.requestRender()
-    }
-
     override fun setScaleType(scaleType: ScaleType) {
-        this.mScaleType = scaleType
+        this.scaleType = scaleType
     }
 
     override fun measureInternal(
@@ -88,23 +73,29 @@ class VideoRenderer: IRender {
         if (viewWidth <= 0 || viewHeight <= 0 || videoWidth <= 0 || videoHeight <= 0) {
             return
         }
-        halfRightVerticeData = TextureCropUtil.calculateHalfRightVerticeData(mScaleType, viewWidth, viewHeight, videoWidth, videoHeight)
+
+        halfRightVerticeData = TextureCropUtil.calculateHalfRightVerticeData(scaleType,
+            viewWidth, viewHeight, videoWidth, videoHeight)
         triangleVertices = ByteBuffer.allocateDirect(halfRightVerticeData.size * FLOAT_SIZE_BYTES)
             .order(ByteOrder.nativeOrder()).asFloatBuffer()
-        triangleVertices?.put(halfRightVerticeData)?.position(0)
+        triangleVertices!!.put(halfRightVerticeData).position(0)
     }
 
-    override fun onDrawFrame(gl: GL10?) {
+    override fun setSurfaceListener(surfaceListener: IRender.SurfaceListener) {
+        this.surfaceListener = surfaceListener
+    }
+
+    override fun onDrawFrame(glUnused: GL10) {
         if (updateSurface.compareAndSet(true, false)) {
             try {
-                surfaceTexture?.updateTexImage()
+                surfaceTexture!!.updateTexImage()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-            surfaceTexture?.getTransformMatrix(sTMatrix)
+            surfaceTexture!!.getTransformMatrix(sTMatrix)
         }
 
-        GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT and GLES20.GL_COLOR_BUFFER_BIT)
+        GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT or GLES20.GL_COLOR_BUFFER_BIT)
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
         if (!canDraw.get()) {
             GLES20.glFinish()
@@ -113,13 +104,13 @@ class VideoRenderer: IRender {
         GLES20.glEnable(GLES20.GL_BLEND)
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA)
 
-        GLES20.glUseProgram(programId)
+        GLES20.glUseProgram(programID)
         checkGlError("glUseProgram")
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
-        GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, textureId)
+        GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, textureID)
 
-        triangleVertices?.position(TRIANGLE_VERTICES_DATA_POS_OFFSET)
+        triangleVertices!!.position(TRIANGLE_VERTICES_DATA_POS_OFFSET)
         GLES20.glVertexAttribPointer(
             aPositionHandle, 3, GLES20.GL_FLOAT, false,
             TRIANGLE_VERTICES_DATA_STRIDE_BYTES, triangleVertices
@@ -128,7 +119,7 @@ class VideoRenderer: IRender {
         GLES20.glEnableVertexAttribArray(aPositionHandle)
         checkGlError("glEnableVertexAttribArray aPositionHandle")
 
-        triangleVertices?.position(TRIANGLE_VERTICES_DATA_UV_OFFSET)
+        triangleVertices!!.position(TRIANGLE_VERTICES_DATA_UV_OFFSET)
         GLES20.glVertexAttribPointer(
             aTextureHandle, 3, GLES20.GL_FLOAT, false,
             TRIANGLE_VERTICES_DATA_STRIDE_BYTES, triangleVertices
@@ -147,33 +138,35 @@ class VideoRenderer: IRender {
         GLES20.glFinish()
     }
 
-    override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
+    override fun onSurfaceChanged(glUnused: GL10, width: Int, height: Int) {
         GLES20.glViewport(0, 0, width, height)
     }
 
-    override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
-        val vertexShader: String = ShaderUtil.loadFromAssetsFile("vertex.sh", glSurfaceView?.resources)
-        val fragShader: String = ShaderUtil.loadFromAssetsFile("frag.sh", glSurfaceView?.resources)
-        programId = createProgram(vertexShader, fragShader)
-        if (programId == 0) {
+    override fun onSurfaceCreated(glUnused: GL10, config: EGLConfig) {
+        val vertexShader = ShaderUtil.loadFromAssetsFile("vertex.sh", glSurfaceView!!.resources)
+        val fragShader = ShaderUtil.loadFromAssetsFile("frag.sh", glSurfaceView!!.resources)
+        programID = createProgram(vertexShader, fragShader)
+        if (programID == 0) {
             return
         }
-        aPositionHandle = GLES20.glGetAttribLocation(programId, "aPosition")
+        aPositionHandle = GLES20.glGetAttribLocation(programID, "aPosition")
         checkGlError("glGetAttribLocation aPosition")
         if (aPositionHandle == -1) {
             throw RuntimeException("Could not get attrib location for aPosition")
         }
-        aTextureHandle = GLES20.glGetAttribLocation(programId, "aTextureCoord")
+        aTextureHandle = GLES20.glGetAttribLocation(programID, "aTextureCoord")
         checkGlError("glGetAttribLocation aTextureCoord")
         if (aTextureHandle == -1) {
             throw RuntimeException("Could not get attrib location for aTextureCoord")
         }
-        uMVPMatrixHandle = GLES20.glGetUniformLocation(programId, "uMVPMatrix")
+
+        uMVPMatrixHandle = GLES20.glGetUniformLocation(programID, "uMVPMatrix")
         checkGlError("glGetUniformLocation uMVPMatrix")
         if (uMVPMatrixHandle == -1) {
             throw RuntimeException("Could not get attrib location for uMVPMatrix")
         }
-        uSTMatrixHandle = GLES20.glGetUniformLocation(programId, "uSTMatrix")
+
+        uSTMatrixHandle = GLES20.glGetUniformLocation(programID, "uSTMatrix")
         checkGlError("glGetUniformLocation uSTMatrix")
         if (uSTMatrixHandle == -1) {
             throw RuntimeException("Could not get attrib location for uSTMatrix")
@@ -182,11 +175,11 @@ class VideoRenderer: IRender {
     }
 
     private fun prepareSurface() {
-        val textures = IntArray(1, {0})
+        val textures = IntArray(1)
         GLES20.glGenTextures(1, textures, 0)
 
-        textureId = textures[0]
-        GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, textureId)
+        textureID = textures[0]
+        GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, textureID)
         checkGlError("glBindTexture textureID")
 
         GLES20.glTexParameterf(
@@ -198,52 +191,37 @@ class VideoRenderer: IRender {
             GLES20.GL_LINEAR.toFloat()
         )
 
-        surfaceTexture = SurfaceTexture(textureId)
+        surfaceTexture = SurfaceTexture(textureID)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
             surfaceTexture!!.setDefaultBufferSize(
-                glSurfaceView!!.getMeasuredWidth(),
-                glSurfaceView!!.getMeasuredHeight()
+                glSurfaceView!!.measuredWidth,
+                glSurfaceView!!.measuredHeight
             )
         }
         surfaceTexture!!.setOnFrameAvailableListener(this)
 
         val surface = Surface(this.surfaceTexture)
-        mSurfaceListener?.onSurfacePrepared(surface)
+        if (surfaceListener != null) {
+            surfaceListener!!.onSurfacePrepared(surface)
+        }
         updateSurface.compareAndSet(true, false)
     }
 
-    override fun onFrameAvailable(surfaceTexture: SurfaceTexture?) {
+    override fun onFrameAvailable(surface: SurfaceTexture) {
         updateSurface.compareAndSet(false, true)
         glSurfaceView!!.requestRender()
     }
 
-    private fun createProgram(vertexSource: String, fragmentSource: String): Int {
-        val vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexSource)
-        if (vertexShader == 0) {
-            return 0
-        }
-        val fragShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentSource)
-        if (fragShader == 0) {
-            return 0
-        }
+    override fun onFirstFrame() {
+        canDraw.compareAndSet(false, true)
+        Log.i(TAG, "onFirstFrame:    canDraw = " + canDraw.get())
+        glSurfaceView!!.requestRender()
+    }
 
-        var program = GLES20.glCreateProgram()
-        if (program != 0) {
-            GLES20.glAttachShader(program, vertexShader)
-            checkGlError("glAttachShader")
-            GLES20.glAttachShader(program, fragShader)
-            checkGlError("glAttachShader")
-            GLES20.glLinkProgram(program)
-            val linkStatus = IntArray(1, {0})
-            GLES20.glGetProgramiv(program, GLES20.GL_LINK_STATUS, linkStatus, 0)
-            if (linkStatus[0] != GLES20.GL_TRUE) {
-                Log.e(TAG, "Could not link program: ")
-                Log.e(TAG, GLES20.glGetProgramInfoLog(program))
-                GLES20.glDeleteProgram(program)
-                program = 0
-            }
-        }
-        return program
+    override fun onCompletion() {
+        canDraw.compareAndSet(true, false)
+        Log.i(TAG, "onCompletion:   canDraw = " + canDraw.get())
+        glSurfaceView!!.requestRender()
     }
 
     private fun loadShader(shaderType: Int, source: String): Int {
@@ -251,7 +229,7 @@ class VideoRenderer: IRender {
         if (shader != 0) {
             GLES20.glShaderSource(shader, source)
             GLES20.glCompileShader(shader)
-            val compiled = IntArray(1, {0})
+            val compiled = IntArray(1)
             GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compiled, 0)
             if (compiled[0] == 0) {
                 Log.e(TAG, "Could not compile shader $shaderType:")
@@ -263,10 +241,39 @@ class VideoRenderer: IRender {
         return shader
     }
 
+    private fun createProgram(vertexSource: String, fragmentSource: String): Int {
+        val vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexSource)
+        if (vertexShader == 0) {
+            return 0
+        }
+        val pixelShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentSource)
+        if (pixelShader == 0) {
+            return 0
+        }
+        var program = GLES20.glCreateProgram()
+        if (program != 0) {
+            GLES20.glAttachShader(program, vertexShader)
+            checkGlError("glAttachShader")
+            GLES20.glAttachShader(program, pixelShader)
+            checkGlError("glAttachShader")
+            GLES20.glLinkProgram(program)
+            val linkStatus = IntArray(1)
+            GLES20.glGetProgramiv(program, GLES20.GL_LINK_STATUS, linkStatus, 0)
+            if (linkStatus[0] != GLES20.GL_TRUE) {
+                Log.e(TAG, "Could not link programID: ")
+                Log.e(TAG, GLES20.glGetProgramInfoLog(program))
+                GLES20.glDeleteProgram(program)
+                program = 0
+            }
+        }
+        return program
+    }
+
     private fun checkGlError(op: String) {
         val error: Int = GLES20.glGetError()
         if (error != GLES20.GL_NO_ERROR) {
             Log.e(TAG, "$op: glError $error")
+            // TODO: 2018/4/25 端监控 用于监控礼物播放成功状态
         }
     }
 }

@@ -8,7 +8,6 @@ import android.view.Surface
 import com.ss.ugc.android.alpha_player.controller.IPlayerControllerExt
 import com.ss.ugc.android.alpha_player.model.ScaleType
 import com.ss.ugc.android.alpha_player.render.IRender
-import com.ss.ugc.android.alpha_player.render.VideoRenderer
 
 class AlphaVideoView @JvmOverloads constructor(context: Context, attr: AttributeSet? = null)
     : GLSurfaceView(context, attr) {
@@ -59,7 +58,7 @@ class AlphaVideoView @JvmOverloads constructor(context: Context, attr: Attribute
         this.mPlayerController = playerController
     }
 
-    fun setVideoRenderer(renderer: VideoRenderer) {
+    fun setVideoRenderer(renderer: IRender) {
         this.mRenderer = renderer
         setRenderer(renderer)
         addOnSurfacePreparedListener()
