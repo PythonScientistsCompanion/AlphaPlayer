@@ -31,9 +31,9 @@ AlphaPlayer是直播中台使用的一个动画特效库，可以通过制作Alp
 
 ##### 添加依赖
 
-```java
+```kotlin
 dependencies {
-		implementation "xxx:1.0.0"
+  implementation "xxx:1.0.0"
 }
 ```
 
@@ -43,7 +43,6 @@ dependencies {
 val config = Configuration(context, lifecycleOwner)
 val playerController = PlayerController.get(config, DefaultSystemPlayer())	// 也可以设置自行实现的Player, demo中提供了基于ExoPlayer的实现
 playerController.setPlayerAction(object: IPlayerAction {
-  
   override fun onVideoSizeChanged(videoWidth: Int, videoHeight: Int, scaleType: ScaleType) {
   }
   override fun startAction() {
