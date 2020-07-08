@@ -2,6 +2,9 @@ package com.ss.ugc.android.alpha_player.model
 
 /**
  * created by dengzhuoyao on 2020/07/07
+ *
+ * A enum class that describe the alpha-video crop type. The specific
+ * relationship can be viewd at {@link TextureCropUtil}
  */
 enum class ScaleType(index: Int) {
 

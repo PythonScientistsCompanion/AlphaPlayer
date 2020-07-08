@@ -31,6 +31,11 @@ class VideoRenderer(glSurfaceView: GLSurfaceView) : IRender {
     private val TRIANGLE_VERTICES_DATA_UV_OFFSET = 3
     private val GL_TEXTURE_EXTERNAL_OES = 0x8D65
 
+    /**
+     * A float array that recorded the mapping relationship between texture
+     * coordinates and window coordinates. It will changed for {@link ScaleType}
+     * by {@link TextureCropUtil}.
+     */
     private var halfRightVerticeData = floatArrayOf(
         // X, Y, Z, U, V
         -1.0f, -1.0f, 0f, 0.5f, 0f,
@@ -51,10 +56,16 @@ class VideoRenderer(glSurfaceView: GLSurfaceView) : IRender {
     private var aPositionHandle: Int = 0
     private var aTextureHandle: Int = 0
 
-    private var surfaceTexture: SurfaceTexture? = null
-    private val updateSurface = AtomicBoolean(false)
+    /**
+     * After mediaPlayer call onCompletion, GLSurfaceView still will call
+     * {@link GLSurfaceView#requestRender} in some special case, so cause
+     * the media source last frame be drawn again. So we add this flag to
+     * avoid this case.
+     */
     private val canDraw = AtomicBoolean(false)
+    private val updateSurface = AtomicBoolean(false)
 
+    private var surfaceTexture: SurfaceTexture? = null
     private var surfaceListener: IRender.SurfaceListener? = null
     private var glSurfaceView: GLSurfaceView? = glSurfaceView
     private var scaleType = ScaleType.ScaleAspectFill
@@ -146,9 +157,7 @@ class VideoRenderer(glSurfaceView: GLSurfaceView) : IRender {
     }
 
     override fun onSurfaceCreated(glUnused: GL10, config: EGLConfig) {
-        val vertexShader = ShaderUtil.loadFromAssetsFile("vertex.sh", glSurfaceView!!.resources)
-        val fragShader = ShaderUtil.loadFromAssetsFile("frag.sh", glSurfaceView!!.resources)
-        programID = createProgram(vertexShader, fragShader)
+        programID = createProgram()
         if (programID == 0) {
             return
         }
@@ -227,6 +236,16 @@ class VideoRenderer(glSurfaceView: GLSurfaceView) : IRender {
         glSurfaceView!!.requestRender()
     }
 
+    /**
+     * load shader by OpenGL ES, if compile shader success, it will return shader handle,
+     * else return 0.
+     *
+     * @param shaderType shader type, {@link GLES20.GL_VERTEX_SHADER} and
+     * {@link GLES20.GL_FRAGMENT_SHADER}
+     * @param source   shader source
+     *
+     * @return shaderID If compile shader success, it will return shader handle, else return 0.
+     */
     private fun loadShader(shaderType: Int, source: String): Int {
         var shader = GLES20.glCreateShader(shaderType)
         if (shader != 0) {
@@ -244,7 +263,16 @@ class VideoRenderer(glSurfaceView: GLSurfaceView) : IRender {
         return shader
     }
 
-    private fun createProgram(vertexSource: String, fragmentSource: String): Int {
+    /**
+     * create program with {@link vertex.sh} and {@link frag.sh}. If attach shader or link
+     * program, it will return 0, else return program handle
+     *
+     * @return programID If link program success, it will return program handle, else return 0.
+     */
+    private fun createProgram(): Int {
+        val vertexSource = ShaderUtil.loadFromAssetsFile("vertex.sh", glSurfaceView!!.resources)
+        val fragmentSource = ShaderUtil.loadFromAssetsFile("frag.sh", glSurfaceView!!.resources)
+
         val vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexSource)
         if (vertexShader == 0) {
             return 0
