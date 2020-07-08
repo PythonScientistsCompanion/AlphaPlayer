@@ -31,21 +31,17 @@ class MainActivity : AppCompatActivity() {
 
     val playerAction = object : IPlayerAction {
         override fun onVideoSizeChanged(videoWidth: Int, videoHeight: Int, scaleType: ScaleType) {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
 
         override fun startAction() {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
 
         override fun endAction() {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
     }
 
     val monitor = object : IMonitor {
         override fun monitor(state: Boolean, playType: String, what: Int, extra: Int, errorInfo: String) {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
     }
 
