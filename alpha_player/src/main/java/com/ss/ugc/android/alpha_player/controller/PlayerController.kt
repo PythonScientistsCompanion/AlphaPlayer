@@ -359,8 +359,8 @@ class PlayerController(context: Context, owner: LifecycleOwner, mediaPlayer: IMe
                 STOP -> {
                     when (playerState) {
                         PlayerState.STARTED, PlayerState.PAUSED -> {
-                            mediaPlayer.stop()
-                            playerState = PlayerState.STOPPED
+                            mediaPlayer.pause()
+                            playerState = PlayerState.PAUSED
                         }
                         else -> {}
                     }
