@@ -211,7 +211,7 @@ class PlayerController(context: Context, owner: LifecycleOwner, mediaPlayer: IMe
     }
 
     override fun getPlayerType(): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return mediaPlayer.getPlayerType()
     }
 
     @WorkerThread
@@ -403,6 +403,6 @@ class PlayerController(context: Context, owner: LifecycleOwner, mediaPlayer: IMe
     }
 
     private fun monitor(state: Boolean, what: Int = 0, extra: Int = 0, errorInfo: String) {
-        mMonitor?.monitor(state, "TODO: playerType", what, extra, errorInfo)
+        mMonitor?.monitor(state, getPlayerType(), what, extra, errorInfo)
     }
 }

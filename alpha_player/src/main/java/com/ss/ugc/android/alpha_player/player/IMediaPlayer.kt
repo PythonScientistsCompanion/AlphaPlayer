@@ -70,6 +70,8 @@ interface IMediaPlayer {
     @Throws(Exception::class)
     fun getVideoInfo(): VideoInfo
 
+    fun getPlayerType(): String
+
     /**
      * Interface definition for a callback to be invoked when playback of a
      * media source has completed.

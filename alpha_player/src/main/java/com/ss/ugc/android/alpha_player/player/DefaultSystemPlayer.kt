@@ -102,4 +102,8 @@ class DefaultSystemPlayer : AbsPlayer() {
 
         return VideoInfo(videoWidth, videoHeight)
     }
+
+    override fun getPlayerType(): String {
+        return "DefaultSystemPlayer"
+    }
 }

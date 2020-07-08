@@ -15,6 +15,7 @@ import com.ss.ugc.android.alpha_player.controller.PlayerController
 import com.ss.ugc.android.alpha_player.model.Configuration
 import com.ss.ugc.android.alpha_player.model.DataSource
 import com.ss.ugc.android.alpha_player.player.DefaultSystemPlayer
+import com.ss.ugc.android.alphavideoplayer.player.ExoPlayerImpl
 import com.ss.ugc.android.alphavideoplayer.utils.JsonUtil
 
 /**
@@ -42,7 +43,8 @@ class VideoGiftView @JvmOverloads constructor(
 
     fun initPlayerController(context: Context, owner: LifecycleOwner, playerAction: IPlayerAction, monitor: IMonitor) {
         val configuration = Configuration(context, owner)
-        mPlayerController = PlayerController.get(configuration, DefaultSystemPlayer())
+//        mPlayerController = PlayerController.get(configuration, DefaultSystemPlayer())
+        mPlayerController = PlayerController.get(configuration, ExoPlayerImpl(context))
         mPlayerController!!.setPlayerAction(playerAction)
         mPlayerController!!.setMonitor(monitor)
     }
