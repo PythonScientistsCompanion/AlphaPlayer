@@ -10,6 +10,7 @@ import android.os.HandlerThread
 import android.os.Looper
 import android.os.Message
 import android.os.Process
+import android.support.annotation.WorkerThread
 import android.text.TextUtils
 import android.util.Log
 import android.view.Surface
@@ -33,14 +34,15 @@ import java.lang.Exception
 class PlayerController(context: Context, owner: LifecycleOwner, mediaPlayer: IMediaPlayer): IPlayerControllerExt, LifecycleObserver, Handler.Callback {
 
     companion object {
-        val SET_DATA_SOURCE: Int =  1
-        val START: Int =            2
-        val PAUSE: Int =            3
-        val RESUME: Int =           4
-        val STOP: Int =             5
-        val DESTROY: Int =          6
-        val SURFACE: Int =          7
-        val RESET: Int =            8
+        val INIT_MEDIA_PLAYER: Int = 1
+        val SET_DATA_SOURCE: Int =  2
+        val START: Int = 3
+        val PAUSE: Int = 4
+        val RESUME: Int = 5
+        val STOP: Int = 6
+        val DESTROY: Int = 7
+        val SURFACE: Int = 8
+        val RESET: Int = 9
 
         fun get(configuration: Configuration, mediaPlayer: IMediaPlayer? = null): PlayerController {
             return PlayerController(configuration.context, configuration.lifecycleOwner,
@@ -101,22 +103,7 @@ class PlayerController(context: Context, owner: LifecycleOwner, mediaPlayer: IMe
     }
 
     private fun initMediaPlayer() {
-        mediaPlayer.setScreenOnWhilePlaying(true)
-        mediaPlayer.setLooping(false)
-
-        mediaPlayer.setOnFirstFrameListener(object : IMediaPlayer.OnFirstFrameListener {
-            override fun onFirstFrame() {
-                alphaVideoView!!.onFirstFrame()
-            }
-        })
-        mediaPlayer.setOnCompletionListener(object : IMediaPlayer.OnCompletionListener {
-            override fun onCompletion() {
-                alphaVideoView!!.onCompletion()
-                playerState = PlayerState.PAUSED
-                monitor(true, errorInfo = "")
-                emitEndSignal()
-            }
-        })
+        sendMessage(getMessage(INIT_MEDIA_PLAYER, null))
     }
 
     override fun setPlayerAction(playerAction: IPlayerAction) {
@@ -227,6 +214,28 @@ class PlayerController(context: Context, owner: LifecycleOwner, mediaPlayer: IMe
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
+    @WorkerThread
+    private fun initPlayer() {
+        mediaPlayer.initMediaPlayer()
+        mediaPlayer.setScreenOnWhilePlaying(true)
+        mediaPlayer.setLooping(false)
+
+        mediaPlayer.setOnFirstFrameListener(object : IMediaPlayer.OnFirstFrameListener {
+            override fun onFirstFrame() {
+                alphaVideoView!!.onFirstFrame()
+            }
+        })
+        mediaPlayer.setOnCompletionListener(object : IMediaPlayer.OnCompletionListener {
+            override fun onCompletion() {
+                alphaVideoView!!.onCompletion()
+                playerState = PlayerState.PAUSED
+                monitor(true, errorInfo = "")
+                emitEndSignal()
+            }
+        })
+    }
+
+    @WorkerThread
     private fun setDataSource(dataSource: DataSource) {
         try {
             setVideoFromFile(dataSource)
@@ -237,6 +246,7 @@ class PlayerController(context: Context, owner: LifecycleOwner, mediaPlayer: IMe
         }
     }
 
+    @WorkerThread
     private fun setVideoFromFile(dataSource: DataSource) {
         mediaPlayer.reset()
         playerState = PlayerState.NOT_PREPARED
@@ -258,6 +268,7 @@ class PlayerController(context: Context, owner: LifecycleOwner, mediaPlayer: IMe
         }
     }
 
+    @WorkerThread
     private fun prepareAsync() {
         mediaPlayer?.let {
             if (playerState == PlayerState.NOT_PREPARED || playerState == PlayerState.STOPPED) {
@@ -268,6 +279,7 @@ class PlayerController(context: Context, owner: LifecycleOwner, mediaPlayer: IMe
         }
     }
 
+    @WorkerThread
     private fun startPlay() {
         when (playerState) {
             PlayerState.PREPARED -> {
@@ -294,6 +306,7 @@ class PlayerController(context: Context, owner: LifecycleOwner, mediaPlayer: IMe
         }
     }
 
+    @WorkerThread
     private fun parseVideoSize() {
         val videoInfo = mediaPlayer.getVideoInfo()
         alphaVideoView!!.measureInternal((videoInfo.videoWidth / 2).toFloat(), videoInfo.videoHeight.toFloat())
@@ -307,6 +320,9 @@ class PlayerController(context: Context, owner: LifecycleOwner, mediaPlayer: IMe
     override fun handleMessage(msg: Message?): Boolean {
         msg?.let {
             when(msg.what) {
+                INIT_MEDIA_PLAYER -> {
+                    initPlayer()
+                }
                 SURFACE -> {
                     val surface = msg.obj as Surface
                     mediaPlayer.setSurface(surface)

@@ -13,31 +13,31 @@ import java.lang.Exception
  */
 class DefaultSystemPlayer : AbsPlayer() {
 
-    val mediaPlayer : MediaPlayer = MediaPlayer()
+    var mediaPlayer : MediaPlayer? = null
     val retriever: MediaMetadataRetriever = MediaMetadataRetriever()
     lateinit var dataPath : String
 
     init {
-        mediaPlayer.setOnCompletionListener(MediaPlayer.OnCompletionListener { mediaPlayer ->
+        mediaPlayer?.setOnCompletionListener(MediaPlayer.OnCompletionListener { mediaPlayer ->
             if (completionListener != null) {
                 completionListener.onCompletion()
             }
         })
 
-        mediaPlayer.setOnPreparedListener(MediaPlayer.OnPreparedListener { mediaPlayer ->
+        mediaPlayer?.setOnPreparedListener(MediaPlayer.OnPreparedListener { mediaPlayer ->
             if (preparedListener != null) {
                 preparedListener.onPrepared()
             }
         })
 
-        mediaPlayer.setOnErrorListener(MediaPlayer.OnErrorListener { mp, what, extra ->
+        mediaPlayer?.setOnErrorListener(MediaPlayer.OnErrorListener { mp, what, extra ->
             if (errorListener != null) {
                 errorListener.onError(what, extra, "")
             }
             false
         })
 
-        mediaPlayer.setOnInfoListener { mp, what, extra ->
+        mediaPlayer?.setOnInfoListener { mp, what, extra ->
             if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
                 if (firstFrameListener != null) {
                     firstFrameListener.onFirstFrame()
@@ -47,47 +47,51 @@ class DefaultSystemPlayer : AbsPlayer() {
         }
     }
 
+    override fun initMediaPlayer() {
+        mediaPlayer = MediaPlayer()
+    }
+
     override fun setSurface(surface: Surface) {
-        mediaPlayer.setSurface(surface)
+        mediaPlayer?.setSurface(surface)
     }
 
     override fun setDataSource(dataPath: String) {
         this.dataPath = dataPath
-        mediaPlayer.setDataSource(dataPath)
+        mediaPlayer?.setDataSource(dataPath)
     }
 
     override fun prepareAsync() {
-        mediaPlayer.prepareAsync()
+        mediaPlayer?.prepareAsync()
     }
 
     override fun start() {
-        mediaPlayer.start()
+        mediaPlayer?.start()
     }
 
     override fun pause() {
-        mediaPlayer.pause()
+        mediaPlayer?.pause()
     }
 
     override fun stop() {
-        mediaPlayer.stop()
+        mediaPlayer?.stop()
     }
 
     override fun reset() {
-        mediaPlayer.reset()
+        mediaPlayer?.reset()
         this.dataPath = ""
     }
 
     override fun release() {
-        mediaPlayer.release()
+        mediaPlayer?.release()
         this.dataPath = ""
     }
 
     override fun setLooping(looping: Boolean) {
-        mediaPlayer.isLooping = looping
+        mediaPlayer?.isLooping = looping
     }
 
     override fun setScreenOnWhilePlaying(onWhilePlaying: Boolean) {
-        mediaPlayer.setScreenOnWhilePlaying(onWhilePlaying)
+        mediaPlayer?.setScreenOnWhilePlaying(onWhilePlaying)
     }
 
     override fun getVideoInfo(): VideoInfo {

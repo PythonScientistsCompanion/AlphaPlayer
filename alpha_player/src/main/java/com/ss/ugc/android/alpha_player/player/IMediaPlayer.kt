@@ -34,6 +34,11 @@ interface IMediaPlayer {
     fun setOnFirstFrameListener(firstFrameListener: OnFirstFrameListener)
 
     /**
+     * Maybe will init mediaPlayer on sub thread.
+     */
+    fun initMediaPlayer()
+
+    /**
      * Sets the Surface to be used as the sink for the video portion of the media.
      */
     fun setSurface(surface: Surface)
