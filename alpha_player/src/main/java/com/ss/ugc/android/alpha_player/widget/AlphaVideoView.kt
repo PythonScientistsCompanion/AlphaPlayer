@@ -5,7 +5,6 @@ import android.graphics.PixelFormat
 import android.opengl.GLSurfaceView
 import android.util.AttributeSet
 import android.view.Surface
-import com.ss.ugc.android.alpha_player.controller.IPlayerController
 import com.ss.ugc.android.alpha_player.controller.IPlayerControllerExt
 import com.ss.ugc.android.alpha_player.model.ScaleType
 import com.ss.ugc.android.alpha_player.render.IRender
